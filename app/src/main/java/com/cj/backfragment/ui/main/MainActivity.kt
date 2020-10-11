@@ -1,25 +1,25 @@
 package com.cj.backfragment.ui.main
 
-import android.content.Intent
+import android.R.attr.fragment
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.cj.backfragment.ChangeFragment
+import androidx.fragment.app.FragmentManager
 import com.cj.backfragment.R
 import com.cj.backfragment.adapter.AdapterPager
 import com.cj.backfragment.fragment.chatfm.ChatFragment
 import com.cj.backfragment.fragment.homefm.HomeFragment
 import com.cj.backfragment.fragment.homefm.base.BaseHomeFragment
-import com.cj.backfragment.fragment.homefm.detail.DetailFragment
 import com.cj.backfragment.fragment.newfm.NewFragment
 import com.google.android.material.navigation.NavigationView
 import com.uits.baseproject.base.BaseContainerFragment
 import com.uits.baseproject.base.BaseFragment
 import com.uits.baseproject.base.OnCurrentFragmentListener
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     OnCurrentFragmentListener {
@@ -77,15 +77,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackFragment() {
-        val fragment: BaseContainerFragment = getCurrentFragment() as BaseContainerFragment
-        if (!fragment.popFragment()) {
-            val isExit: Boolean = mToastExit.getView()!!.isShown()
-            if (!isExit) {
-                mToastExit.show()
-            } else {
-                super.onBackPressed()
-            }
-        }
+//        val fragment: BaseContainerFragment = getCurrentFragment() as BaseContainerFragment
+//        if (!fragment.popFragment()) {
+//            val isExit: Boolean = mToastExit.getView()!!.isShown()
+//            if (!isExit) {
+//                mToastExit.show()
+//            } else {
+//                super.onBackPressed()
+//            }
+//        }
     }
 
     fun getCurrentFragment(): BaseFragment? {
@@ -94,10 +94,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCurrentFragment(fragment: Fragment) {
         if (fragment is HomeFragment) {
+
+        } else{
+//            supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_ios_24)
         }
     }
 
     override fun onBackPressed() {
-
+        val fm: FragmentManager = supportFragmentManager
+        for (frag in fm.getFragments()) {
+            if (frag.isVisible && mViewPager.currentItem == 0) {
+                val childFm: FragmentManager = frag.childFragmentManager
+                if (childFm.getBackStackEntryCount() > 0) {
+                    childFm.popBackStack()
+                    return
+                }
+            }
+        }
+        super.onBackPressed()
     }
 }
